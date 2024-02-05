@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18.0)
-set(THIS_PROJECT mini-tasker)
+set(THIS_PROJECT fireplace)
 project(${THIS_PROJECT} VERSION 0.1.0)
 
 if( TARGET_PLATFORM STREQUAL "GTK4" )

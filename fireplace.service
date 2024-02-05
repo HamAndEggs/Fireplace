@@ -4,7 +4,7 @@ After=network-online.target
 Description=Displays time and current task in frame buffer zero.
 
 [Service]
-ExecStart=/usr/bin/mini-tasker /usr/share/mini-tasker
+ExecStart=/usr/bin/fireplace /usr/share/fireplace
 
 [Install]
 WantedBy=multi-user.target

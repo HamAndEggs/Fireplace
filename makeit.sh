@@ -7,8 +7,8 @@ function ShowHelp() {
 	echo ""
 }
 
-BUILD_TARGET="mini-tasker"
-OUTPUT_EXEC="mini-tasker"
+BUILD_TARGET="fireplace"
+OUTPUT_EXEC="fireplace"
 TARGET_PLATFORM="DRM"
 NUMBER_OF_THREADS=$(nproc --all)
 CMAKE_BUILD_TYPE="Debug"

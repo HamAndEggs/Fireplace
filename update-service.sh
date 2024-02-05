@@ -1,13 +1,9 @@
 #/bin/bash
-APP_FOLDER="/usr/share/mini-tasker"
+APP_NAME="fireplace"
+APP_FOLDER="/usr/share/$APP_NAME"
 
 echo "Updating repo"
 git pull
-
-echo "Updating EdgeUI repo"
-cd ./EdgeUI
-git pull
-cd ..
 
 ./update-resources.sh
 
@@ -16,8 +12,8 @@ echo "Building application"
 ./makeit.sh DRM Release
 
 echo "Updaing service"
-sudo systemctl stop mini-tasker
-sudo cp ./build/Release/mini-tasker /usr/bin/mini-tasker
-sudo systemctl start mini-tasker
-sudo systemctl status mini-tasker
+sudo systemctl stop $APP_NAME
+sudo cp ./build/Release/$APP_NAME /usr/bin/$APP_NAME
+sudo systemctl start $APP_NAME
+sudo systemctl status $APP_NAME
 

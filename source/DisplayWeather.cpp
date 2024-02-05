@@ -60,7 +60,7 @@ static std::string ReadWeatherKey(const std::string& pPath)
     {
         try
         {
-            key = tinytools::file::LoadFileIntoString("/usr/share/mini-tasker/weather.key");
+            key = tinytools::file::LoadFileIntoString("/usr/share/fireplace/weather.key");
         }
         catch(std::runtime_error &e)
         {

@@ -1,6 +1,6 @@
 #/bin/bash
-SERVICE_NAME="mini-tasker"
-APP_NAME="mini-tasker"
+SERVICE_NAME="fireplace"
+APP_NAME="fireplace"
 APP_FOLDER="/usr/share/$APP_NAME"
 
 echo "This script uses sudo, please review first if you're not sure."

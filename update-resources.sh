@@ -1,5 +1,5 @@
 #/bin/bash
-APP_FOLDER="/usr/share/mini-tasker"
+APP_FOLDER="/usr/share/fireplace"
 
 echo "Updating resources"
 ./resource-installer.sh $APP_FOLDER liberation_serif_font ttf
