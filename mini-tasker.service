@@ -1,0 +1,11 @@
+[Unit]
+Wants=network-online.target
+After=network-online.target
+Description=Displays time and current task in frame buffer zero.
+
+[Service]
+ExecStart=/usr/bin/mini-tasker /usr/share/mini-tasker
+
+[Install]
+WantedBy=multi-user.target
+
