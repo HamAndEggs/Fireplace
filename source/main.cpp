@@ -50,6 +50,8 @@ public:
     virtual eui::ElementPtr GetRootElement(){return mRoot;}
     virtual uint32_t GetUpdateInterval()const{return 1000;}
 
+    virtual int GetEmulatedWidth()const{return 1080*7/10;}
+    virtual int GetEmulatedHeight()const{return 1920*7/10;}
 
 private:
     const float CELL_PADDING = 0.02f;
@@ -113,8 +115,8 @@ void MyUI::OnOpen(eui::Graphics* pGraphics)
     int bitcoinFont = pGraphics->FontLoad(mPath + "liberation_serif_font/LiberationSerif-Bold.ttf",70);
 
     mInfoRoot->SetFont(normalFont);
-    mInfoRoot->GetStyle().mTexture = pGraphics->TextureLoadPNG(mPath + "images/bg-pastal-01.png");
-    mInfoRoot->GetStyle().mBackground = eui::COLOUR_WHITE;
+//    mInfoRoot->GetStyle().mTexture = pGraphics->TextureLoadPNG(mPath + "images/bg-pastal-01.png");
+    mInfoRoot->GetStyle().mBackground = eui::COLOUR_NONE;
 
     eui::ElementPtr BottomPannel = new eui::Element;
         BottomPannel->SetPos(0,2);
