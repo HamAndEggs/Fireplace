@@ -57,6 +57,7 @@ private:
     const float BORDER_SIZE = 3.0f;
     const std::string mPath;
     eui::ElementPtr mRoot = nullptr;
+    eui::ElementPtr mInfoRoot = nullptr;
     MQTTData* MQTT = nullptr;
     std::map<std::string,std::string> mMQTTData;
 
@@ -90,9 +91,15 @@ void MyUI::OnOpen(eui::Graphics* pGraphics)
     pGraphics->SetDisplayRotation(eui::Graphics::ROTATE_FRAME_PORTRAIT);
     
     mRoot = new eui::Element;
-
     mRoot->SetID("mainScreen");
-    mRoot->SetGrid(3,3);
+    mRoot->SetGrid(1,2);
+
+    mInfoRoot = new eui::Element;
+    mInfoRoot->SetID("InfoScreen");
+    mInfoRoot->SetPos(0,0);
+    mInfoRoot->SetGrid(3,3);
+
+    mRoot->Attach(mInfoRoot);
 
     StartMQTT();    
 
@@ -105,9 +112,9 @@ void MyUI::OnOpen(eui::Graphics* pGraphics)
 
     int bitcoinFont = pGraphics->FontLoad(mPath + "liberation_serif_font/LiberationSerif-Bold.ttf",70);
 
-    mRoot->SetFont(normalFont);
-    mRoot->GetStyle().mTexture = pGraphics->TextureLoadPNG(mPath + "images/bg-pastal-01.png");
-    mRoot->GetStyle().mBackground = eui::COLOUR_WHITE;
+    mInfoRoot->SetFont(normalFont);
+    mInfoRoot->GetStyle().mTexture = pGraphics->TextureLoadPNG(mPath + "images/bg-pastal-01.png");
+    mInfoRoot->GetStyle().mBackground = eui::COLOUR_WHITE;
 
     eui::ElementPtr BottomPannel = new eui::Element;
         BottomPannel->SetPos(0,2);
@@ -123,15 +130,15 @@ void MyUI::OnOpen(eui::Graphics* pGraphics)
 
         mSolar = new DisplaySolaX(pGraphics,mPath,largeFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS);
         BottomPannel->Attach(mSolar);
-    mRoot->Attach(BottomPannel);
+    mInfoRoot->Attach(BottomPannel);
 
-    mRoot->Attach(new DisplayClock(bigFont,normalFont,miniFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
-    mRoot->Attach(new DisplayWeather(pGraphics,mPath,bigFont,normalFont,miniFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
+    mInfoRoot->Attach(new DisplayClock(bigFont,normalFont,miniFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
+    mInfoRoot->Attach(new DisplayWeather(pGraphics,mPath,bigFont,normalFont,miniFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
 
     eui::ElementPtr status = new eui::Element;
     status->SetGrid(1,2);
     status->SetPos(2,0);
-    mRoot->Attach(status);
+    mInfoRoot->Attach(status);
     status->Attach(new DisplaySystemStatus(bigFont,normalFont,miniFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
     status->Attach(new DisplayAirQuality(largeFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
 
@@ -157,7 +164,7 @@ void MyUI::OnOpen(eui::Graphics* pGraphics)
         mOutSideTemp = new Temperature(temperatureFont,mBTC->GetUpStyle(),CELL_PADDING);
             mOutSideTemp->SetPos(0,1);
         topCentre->Attach(mOutSideTemp);
-    mRoot->Attach(topCentre);
+    mInfoRoot->Attach(topCentre);
 
     std::cout << "UI started\n";
 }
@@ -165,8 +172,8 @@ void MyUI::OnOpen(eui::Graphics* pGraphics)
 
 void MyUI::OnClose()
 {
-    delete mRoot;
-    mRoot = nullptr;
+    delete mInfoRoot;
+    mInfoRoot = nullptr;
 }
 
 void MyUI::StartMQTT()
