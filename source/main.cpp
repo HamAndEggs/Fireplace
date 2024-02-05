@@ -86,6 +86,8 @@ MyUI::~MyUI()
 void MyUI::OnOpen(eui::Graphics* pGraphics)
 {
     std::cout << "mPath = " << mPath << "\n";
+
+    pGraphics->SetDisplayRotation(eui::Graphics::ROTATE_FRAME_PORTRAIT);
     
     mRoot = new eui::Element;
 
