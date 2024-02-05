@@ -92,7 +92,7 @@ void MyUI::OnOpen(eui::Graphics* pGraphics)
     
     mRoot = new eui::Element;
     mRoot->SetID("mainScreen");
-    mRoot->SetGrid(1,2);
+    mRoot->SetGrid(1,3);
 
     mInfoRoot = new eui::Element;
     mInfoRoot->SetID("InfoScreen");
