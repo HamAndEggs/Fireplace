@@ -426,6 +426,7 @@ public:
 	 * pPauseInterval is seconds.
 	 */
 	void Tick(int pPauseInterval,std::function<void()> pTheWork);
+	void TickMS(int pPauseMilliSeconds,std::function<void()> pTheWork);
 
 	/**
 	 * @brief Called from another thread, will ask it to exit and then wait for it to do so.

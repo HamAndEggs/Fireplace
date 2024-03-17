@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.18.0)
 set(THIS_PROJECT fireplace)
 project(${THIS_PROJECT} VERSION 0.1.0)
 
+
 if( TARGET_PLATFORM STREQUAL "GTK4" )
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(GTK4 REQUIRED gtk4)
@@ -11,6 +12,7 @@ endif()
 include_directories(
     /usr/include/freetype2
     /usr/include/libdrm
+    /usr/include/gstreamer-1.0
     ./EdgeUI/include
     ./source
     ${GTK4_INCLUDE_DIRS}
@@ -34,16 +36,18 @@ add_executable(${THIS_PROJECT}
     ./source/TinyWeather.cpp
     ./source/DisplayTideData.cpp
     ./source/FileDownload.cpp
+    ./source/VideoToTexture.cpp
 )
 
 set_property(TARGET ${THIS_PROJECT} PROPERTY CXX_STANDARD 17)
+set(COMMON_LIBS stdc++ pthread m freetype GLESv2 EGL z i2c mosquitto curl avcodec avfilter avformat avdevice avutil swresample)
 
 if( TARGET_PLATFORM STREQUAL "GTK4" )
-    target_link_libraries(${THIS_PROJECT} EdgeUI.GTK4 stdc++ pthread m freetype GLESv2 EGL z i2c mosquitto curl ${GTK4_LINK_LIBRARIES})
+    target_link_libraries(${THIS_PROJECT} EdgeUI.GTK4 ${COMMON_LIBS} ${GTK4_LINK_LIBRARIES})
 elseif( TARGET_PLATFORM STREQUAL "DRM" )
-    target_link_libraries(${THIS_PROJECT} EdgeUI.DRM stdc++ pthread m freetype GLESv2 EGL z i2c mosquitto curl gbm drm)
+    target_link_libraries(${THIS_PROJECT} EdgeUI.DRM ${COMMON_LIBS} gbm drm)
 elseif( TARGET_PLATFORM STREQUAL "X11" )
-    target_link_libraries(${THIS_PROJECT} EdgeUI.X11 stdc++ pthread m freetype GLESv2 EGL z i2c mosquitto curl X11 GL)
+    target_link_libraries(${THIS_PROJECT} EdgeUI.X11 ${COMMON_LIBS} X11 GL)
 else()
     message(FATAL_ERROR "TARGET_PLATFORM not defined")
 endif()

@@ -34,6 +34,9 @@
 #include <filesystem>
 #include <curl/curl.h> // libcurl4-openssl-dev
 
+// https://ffmpeg.org/doxygen/0.6/api-example_8c-source.html
+// for video to texture 
+
 class MyUI : public eui::Application
 {
 public:

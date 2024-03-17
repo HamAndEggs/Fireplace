@@ -977,6 +977,26 @@ void SleepableThread::Tick(int pPauseInterval,std::function<void()> pTheWork)
 	});
 }
 
+void SleepableThread::TickMS(int pPauseMilliSeconds,std::function<void()> pTheWork)
+{
+	if( pTheWork == nullptr )
+	{
+		TINYTOOLS_THROW("SleepableThread passed nullpoint for the work to do...");
+	}
+
+    mKeepGoing = true;
+	mWorkerThread = std::thread([this,pPauseMilliSeconds,pTheWork]()
+	{
+		while(mKeepGoing)
+		{
+			pTheWork();
+			std::unique_lock<std::mutex> lk(mSleeperMutex);
+			mSleeper.wait_for(lk,std::chrono::milliseconds(pPauseMilliSeconds));
+		};
+	});
+}
+
+
 void SleepableThread::TellThreadToExitAndWait()
 {
 	mKeepGoing = false;
