@@ -15,13 +15,13 @@ VideoToTexture::~VideoToTexture()
     fclose(mFile);
 
     av_parser_close(parser);
-    avcodec_free_context(&c);
+    avcodec_free_context(&codec_context);
     av_frame_free(&frame);
     av_packet_free(&pkt);
 }
 
 bool VideoToTexture::Open(const std::string& pFilename)
-{
+{/*
     codec = avcodec_find_decoder(AV_CODEC_ID_H264);
     if(!codec) {
         std::cerr << "Error: cannot find the h264 codec: " << filepath.c_str() <<< "\n";
@@ -60,14 +60,14 @@ bool VideoToTexture::Open(const std::string& pFilename)
 
     mFrameRender.TickMS(1000 / 25,[this](){
         bool keepGoing = true;
-                /* read raw data from the input file */
+                // read raw data from the input file 
         size_t data_size = fread(inbuf, 1, INBUF_SIZE, f);
         if (ferror(f))
             keepGoing = false;
 
         int eof = !data_size;
  
-        /* use the parser to split the data into frames */
+        // use the parser to split the data into frames 
         uint8_t *data = inbuf;
         while ( (data_size > 0 || eof) && keepGoing ) {
 
@@ -101,7 +101,8 @@ bool VideoToTexture::Open(const std::string& pFilename)
         }
     });
 
-    return true;
+    return true;*/
+    return false;
 }
 
 void VideoToTexture::decode(AVCodecContext *dec_ctx, AVFrame *frame, AVPacket *pkt)
@@ -130,10 +131,10 @@ void VideoToTexture::UpdateFrame(AVFrame *frame)
 {
     // the picture is allocated by the decoder. no need to free it
     const uint8_t* srcPixels = frame->data[0];
-    const int lineSize = std::abs(frame->linesize);
+    const int lineSize = std::abs(frame->linesize[0]);
     const int width = frame->width;
     const int height = frame->height;
-    std::unique_lock<std::mutex> lk(mSleeperMutex);
+//    std::unique_lock<std::mutex> lk(mSleeperMutex);
     if( mCurrentFrame.pixels == nullptr || mCurrentFrame.width != width || mCurrentFrame.height != height )
     {
         delete []mCurrentFrame.pixels;

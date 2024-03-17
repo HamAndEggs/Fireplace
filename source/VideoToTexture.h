@@ -25,7 +25,7 @@ public:
 
 private:
     const static int  H264_INBUF_SIZE  = 16384; // number of bytes we read per chunk
-    uint8_t inbuf[H264_INBUF_SIZE + FF_INPUT_BUFFER_PADDING_SIZE];   
+    uint8_t inbuf[H264_INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];   
 
     struct
     {

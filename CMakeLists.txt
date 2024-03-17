@@ -37,6 +37,7 @@ add_executable(${THIS_PROJECT}
     ./source/DisplayTideData.cpp
     ./source/FileDownload.cpp
     ./source/VideoToTexture.cpp
+    ./source/DaytimeDisplay.cpp
 )
 
 set_property(TARGET ${THIS_PROJECT} PROPERTY CXX_STANDARD 17)

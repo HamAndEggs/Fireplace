@@ -20,14 +20,9 @@
 #include "Application.h"
 
 
-#include "DisplayClock.h"
-#include "DisplayWeather.h"
-#include "DisplaySolaX.h"
-#include "DisplaySystemStatus.h"
-#include "DisplayAirQuality.h"
-#include "DisplayBitcoinPrice.h"
-#include "DisplayTideData.h"
-#include "Temperature.h"
+#include "TinyTools.h"
+#include "DaytimeDisplay.h"
+
 #include "MQTTData.h"
 
 #include <unistd.h>
@@ -50,27 +45,24 @@ public:
         MQTT->Tick();
     }
 
-    virtual eui::ElementPtr GetRootElement(){return mRoot;}
+    virtual eui::ElementPtr GetRootElement(){return daytimeDisplay;}
     virtual uint32_t GetUpdateInterval()const{return 1000;}
 
-    virtual int GetEmulatedWidth()const{return 1080*7/10;}
-    virtual int GetEmulatedHeight()const{return 1920*7/10;}
+    virtual int GetEmulatedWidth()const{return 1080;}
+    virtual int GetEmulatedHeight()const{return 1920;}
 
 private:
     const float CELL_PADDING = 0.02f;
     const float RECT_RADIUS = 0.2f;
     const float BORDER_SIZE = 3.0f;
     const std::string mPath;
-    eui::ElementPtr mRoot = nullptr;
-    eui::ElementPtr mInfoRoot = nullptr;
+
+    DaytimeDisplay* daytimeDisplay = nullptr;
+
+
     MQTTData* MQTT = nullptr;
     std::map<std::string,std::string> mMQTTData;
 
-    Temperature *mOutSideTemp;
-    DisplayBitcoinPrice* mBTC; 
-    std::string myBTC = "n/a";
-
-    DisplaySolaX* mSolar = nullptr;
     int n = 0;
 
 
@@ -95,81 +87,17 @@ void MyUI::OnOpen(eui::Graphics* pGraphics)
 
     pGraphics->SetDisplayRotation(eui::Graphics::ROTATE_FRAME_PORTRAIT);
     
-    mRoot = new eui::Element;
-    mRoot->SetID("mainScreen");
-    mRoot->SetGrid(1,3);
-
-    mInfoRoot = new eui::Element;
-    mInfoRoot->SetID("InfoScreen");
-    mInfoRoot->SetPos(0,0);
-    mInfoRoot->SetGrid(3,3);
-
-    mRoot->Attach(mInfoRoot);
-
     StartMQTT();    
 
     int miniFont = pGraphics->FontLoad(mPath + "liberation_serif_font/LiberationSerif-Regular.ttf",25);
     int normalFont = pGraphics->FontLoad(mPath + "liberation_serif_font/LiberationSerif-Regular.ttf",40);
-    int temperatureFont = pGraphics->FontLoad(mPath + "liberation_serif_font/LiberationSerif-Bold.ttf",49);
+
     int largeFont = pGraphics->FontLoad(mPath + "liberation_serif_font/LiberationSerif-Bold.ttf",55);
-
     int bigFont = pGraphics->FontLoad(mPath + "liberation_serif_font/LiberationSerif-Bold.ttf",130);
-
     int bitcoinFont = pGraphics->FontLoad(mPath + "liberation_serif_font/LiberationSerif-Bold.ttf",70);
 
-    mInfoRoot->SetFont(normalFont);
-//    mInfoRoot->GetStyle().mTexture = pGraphics->TextureLoadPNG(mPath + "images/bg-pastal-01.png");
-    mInfoRoot->GetStyle().mBackground = eui::COLOUR_NONE;
+    daytimeDisplay = new DaytimeDisplay(mPath,pGraphics,bigFont,normalFont,miniFont,bitcoinFont,largeFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS);
 
-    eui::ElementPtr BottomPannel = new eui::Element;
-        BottomPannel->SetPos(0,2);
-        BottomPannel->SetGrid(3,2);
-        BottomPannel->SetSpan(3,1);
-        mBTC = new DisplayBitcoinPrice(bitcoinFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS);
-        BottomPannel->Attach(mBTC);
-
-        DisplayTideData* tide = new DisplayTideData(largeFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS);
-            tide->SetPos(0,1);
-            tide->SetSpan(3,1);
-            BottomPannel->Attach(tide);
-
-        mSolar = new DisplaySolaX(pGraphics,mPath,largeFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS);
-        BottomPannel->Attach(mSolar);
-    mInfoRoot->Attach(BottomPannel);
-
-    mInfoRoot->Attach(new DisplayClock(bigFont,normalFont,miniFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
-    mInfoRoot->Attach(new DisplayWeather(pGraphics,mPath,bigFont,normalFont,miniFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
-
-    eui::ElementPtr status = new eui::Element;
-    status->SetGrid(1,2);
-    status->SetPos(2,0);
-    mInfoRoot->Attach(status);
-    status->Attach(new DisplaySystemStatus(bigFont,normalFont,miniFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
-    status->Attach(new DisplayAirQuality(largeFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
-
-    eui::ElementPtr topCentre = new eui::Element;
-        topCentre->SetPos(1,0);
-        topCentre->SetGrid(1,2);
-
-        // My bitcoin investment.
-        eui::ElementPtr MyInvestment = new eui::Element(mBTC->GetUpStyle());
-            MyInvestment->SetPadding(0.05f);
-            MyInvestment->SetText("£XXXXXX");
-            MyInvestment->SetPadding(CELL_PADDING);
-            MyInvestment->SetPos(0,0);
-            MyInvestment->SetFont(bitcoinFont);
-            MyInvestment->SetOnUpdate([this](eui::ElementPtr pElement,const eui::Rectangle& pContentRect)
-            {
-                pElement->SetText(myBTC);
-                return true;
-            });
-        topCentre->Attach(MyInvestment);
-        
-        // The temperature outside
-        mOutSideTemp = new Temperature(temperatureFont,mBTC->GetUpStyle(),CELL_PADDING);
-            mOutSideTemp->SetPos(0,1);
-        topCentre->Attach(mOutSideTemp);
-    mInfoRoot->Attach(topCentre);
 
     std::cout << "UI started\n";
 }
@@ -177,8 +105,8 @@ void MyUI::OnOpen(eui::Graphics* pGraphics)
 
 void MyUI::OnClose()
 {
-    delete mInfoRoot;
-    mInfoRoot = nullptr;
+    delete daytimeDisplay;
+    daytimeDisplay = nullptr;
 }
 
 void MyUI::StartMQTT()
@@ -218,38 +146,7 @@ void MyUI::StartMQTT()
         {
 //            std::cout << "MQTTData " << pTopic << " " << pData << "\n";
             mMQTTData[pTopic] = pData;
-
-            // Record when we last seen a change, if we don't see one for a while something is wrong.
-            // I send an 'hartbeat' with new data that is just a value incrementing.
-            // This means we get an update even if the tempareture does not change.
-            if( tinytools::string::CompareNoCase(pTopic,"/outside/temperature") && mOutSideTemp )
-            {
-                mOutSideTemp->NewShedOutSide(pData);
-            }
-            else if( tinytools::string::CompareNoCase(pTopic,"/shed/temperature") && mOutSideTemp)
-            {
-                mOutSideTemp->NewShedTemperature(pData);
-            }
-            else if( tinytools::string::CompareNoCase(pTopic,"/btc/gb") )
-            {
-                mBTC->UpdateGBP(pData);
-            }
-            else if( tinytools::string::CompareNoCase(pTopic,"/btc/usd") )
-            {
-                mBTC->UpdateUSD(pData);
-            }
-            else if( tinytools::string::CompareNoCase(pTopic,"/btc/change") )
-            {
-                mBTC->UpdateChange(pData);
-            }
-            else if( tinytools::string::CompareNoCase(pTopic,"/btc/mine") )
-            {
-                myBTC = pData;
-            }
-            else if( tinytools::string::CompareNoCase(pTopic,"/solar/",7) )
-            {
-                mSolar->UpdateData(pTopic,pData);
-            }
+            daytimeDisplay->OnMQTT(pTopic,pData);
         });
 
 }
