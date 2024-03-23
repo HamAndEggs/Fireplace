@@ -22,6 +22,7 @@
 
 #include "TinyTools.h"
 #include "DaytimeDisplay.h"
+#include "NightDisplay.h"
 
 #include "MQTTData.h"
 
@@ -43,9 +44,24 @@ public:
     virtual void OnUpdate()
     {
         MQTT->Tick();
+        // See which we will draw.
+        std::time_t result = std::time(nullptr);
+        tm *currentTime = localtime(&result);
+        if( currentTime )
+        {
+            if( currentTime->tm_hour < 6 || currentTime->tm_hour > 18 )
+            {
+                current = nightDisplay;
+            }
+            else
+            {
+                current = daytimeDisplay;
+            }
+        }
+
     }
 
-    virtual eui::ElementPtr GetRootElement(){return daytimeDisplay;}
+    virtual eui::ElementPtr GetRootElement(){return current;}
     virtual uint32_t GetUpdateInterval()const{return 1000;}
 
     virtual int GetEmulatedWidth()const{return 1080;}
@@ -57,7 +73,9 @@ private:
     const float BORDER_SIZE = 3.0f;
     const std::string mPath;
 
+    eui::ElementPtr current = nullptr;
     DaytimeDisplay* daytimeDisplay = nullptr;
+    NightDisplay* nightDisplay = nullptr;
 
 
     MQTTData* MQTT = nullptr;
@@ -97,7 +115,9 @@ void MyUI::OnOpen(eui::Graphics* pGraphics)
     int bitcoinFont = pGraphics->FontLoad(mPath + "liberation_serif_font/LiberationSerif-Bold.ttf",70);
 
     daytimeDisplay = new DaytimeDisplay(mPath,pGraphics,bigFont,normalFont,miniFont,bitcoinFont,largeFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS);
+    nightDisplay = new NightDisplay(mPath,pGraphics,bigFont,normalFont,miniFont,bitcoinFont,largeFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS);
 
+    current = daytimeDisplay;
 
     std::cout << "UI started\n";
 }
@@ -107,6 +127,9 @@ void MyUI::OnClose()
 {
     delete daytimeDisplay;
     daytimeDisplay = nullptr;
+
+    delete nightDisplay;
+    nightDisplay = nullptr;
 }
 
 void MyUI::StartMQTT()

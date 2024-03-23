@@ -18,7 +18,7 @@
 #include <time.h>
 #include <chrono>
 
-DisplayClock::DisplayClock(int pBigFont,int pNormalFont,int pMiniFont,float CELL_PADDING,float BORDER_SIZE,float RECT_RADIUS)
+DisplayClock::DisplayClock(int pBigFont,int pNormalFont,int pMiniFont,float CELL_PADDING,float BORDER_SIZE)
 {
     this->SetID("clock");
     this->SetPos(0,0);

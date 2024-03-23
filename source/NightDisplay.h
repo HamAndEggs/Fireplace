@@ -14,25 +14,28 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
    
-#ifndef DISPLAY_CLOCK_H
-#define DISPLAY_CLOCK_H
+#ifndef NightDisplay_H
+#define NightDisplay_H
 
 #include "Graphics.h"
 #include "Element.h"
 
-class DisplayClock : public eui::Element
+#include <string>
+
+class NightDisplay : public eui::Element
 {
 public:
 
-    DisplayClock(int pBigFont,int pNormalFont,int pMiniFont,float CELL_PADDING,float BORDER_SIZE);
-    virtual bool OnUpdate(const eui::Rectangle& pContentRect);
+    NightDisplay(const std::string &pPath,eui::Graphics* pGraphics,int pBigFont,int pNormalFont,int pMiniFont,int pBitcoinFont,int pLargeFont,float CELL_PADDING,float BORDER_SIZE,float RECT_RADIUS);
+    void OnMQTT(const std::string &pTopic,const std::string &pData);
 
 private:
-    eui::ElementPtr clock = nullptr;
-    eui::ElementPtr dayName = nullptr;
-    eui::ElementPtr dayNumber = nullptr;
+    eui::ElementPtr mInfoRoot = nullptr;
+    class Temperature *mOutSideTemp;
+
+    std::string myBTC = "n/a";
 
 };
 
 
-#endif //#ifndef DISPLAY_CLOCK_H
+#endif //#ifndef NightDisplay_H

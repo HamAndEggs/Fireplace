@@ -14,17 +14,17 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "DaytimeDisplay.h"
+#include "NightDisplay.h"
 #include "DisplayClock.h"
 #include "DisplayWeather.h"
 #include "DisplaySolaX.h"
 #include "DisplaySystemStatus.h"
 #include "DisplayAirQuality.h"
-#include "DisplayBitcoinPrice.h"
+
 #include "DisplayTideData.h"
 #include "Temperature.h"
 
-DaytimeDisplay::DaytimeDisplay(const std::string &pPath,eui::Graphics* pGraphics,int pBigFont,int pNormalFont,int pMiniFont,int pBitcoinFont,int pLargeFont,float CELL_PADDING,float BORDER_SIZE,float RECT_RADIUS)
+NightDisplay::NightDisplay(const std::string &pPath,eui::Graphics* pGraphics,int pBigFont,int pNormalFont,int pMiniFont,int pBitcoinFont,int pLargeFont,float CELL_PADDING,float BORDER_SIZE,float RECT_RADIUS)
 {
 
     this->SetID("mainScreen");
@@ -36,37 +36,17 @@ DaytimeDisplay::DaytimeDisplay(const std::string &pPath,eui::Graphics* pGraphics
     mInfoRoot->SetGrid(3,4);
 
     this->Attach(mInfoRoot);
-    this->GetStyle().mTexture = pGraphics->TextureLoadPNG(pPath + "images/bg-fire-01.png");
-
+    this->GetStyle().mBackground = eui::COLOUR_BLACK;
 
     mInfoRoot->SetFont(pNormalFont);
-    mInfoRoot->GetStyle().mBackground = eui::COLOUR_NONE;
 
-    eui::ElementPtr BottomPannel = new eui::Element;
-        BottomPannel->SetPos(0,2);
-        BottomPannel->SetGrid(3,2);
-        BottomPannel->SetSpan(3,1);
-        mBTC = new DisplayBitcoinPrice(pBitcoinFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS);
-        BottomPannel->Attach(mBTC);
-
-        DisplayTideData* tide = new DisplayTideData(pLargeFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS);
-            tide->SetPos(0,1);
-            tide->SetSpan(3,1);
-            BottomPannel->Attach(tide);
-
-        mSolar = new DisplaySolaX(pGraphics,pPath,pLargeFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS);
-        BottomPannel->Attach(mSolar);
-    mInfoRoot->Attach(BottomPannel);
-
-    mInfoRoot->Attach(new DisplayClock(pBigFont,pNormalFont,pMiniFont,CELL_PADDING,BORDER_SIZE));
-    mInfoRoot->Attach(new DisplayWeather(pGraphics,pPath,pBigFont,pNormalFont,pMiniFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
+    eui::ElementPtr clock = new DisplayClock(pBigFont,pNormalFont,pMiniFont,CELL_PADDING,0);
+    mInfoRoot->Attach(clock);
 
     eui::ElementPtr status = new eui::Element;
     status->SetGrid(1,2);
     status->SetPos(2,0);
     mInfoRoot->Attach(status);
-    status->Attach(new DisplaySystemStatus(pBigFont,pNormalFont,pMiniFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
-    status->Attach(new DisplayAirQuality(pLargeFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
 
     eui::ElementPtr topCentre = new eui::Element;
         topCentre->SetPos(1,0);
@@ -75,7 +55,7 @@ DaytimeDisplay::DaytimeDisplay(const std::string &pPath,eui::Graphics* pGraphics
 	// Leave 0,0 empty for now, obscured by fireplace.
 
         // My bitcoin investment.
-        eui::ElementPtr MyInvestment = new eui::Element(mBTC->GetUpStyle());
+        eui::ElementPtr MyInvestment = new eui::Element();
             MyInvestment->SetPadding(0.05f);
             MyInvestment->SetText("£XXXXXX");
             MyInvestment->SetPadding(CELL_PADDING);
@@ -87,23 +67,21 @@ DaytimeDisplay::DaytimeDisplay(const std::string &pPath,eui::Graphics* pGraphics
                 return true;
             });
         topCentre->Attach(MyInvestment);
-        
+                
     mInfoRoot->Attach(topCentre);
-    
-    //
-    // Bottom 4th line.
-    eui::ElementPtr line4 = new eui::Element;
-        line4->SetPos(0,3);
-        line4->SetGrid(3,2);
-        line4->SetSpan(3,1);    
-            // The temperature outside
-        mOutSideTemp = new Temperature(pLargeFont   ,mBTC->GetUpStyle(),CELL_PADDING);
-            mOutSideTemp->SetPos(0,0);
-        line4->Attach(mOutSideTemp);
-    mInfoRoot->Attach(line4);
+
+    eui::Style temp;
+    temp.mBackground = eui::COLOUR_NONE;
+
+    mOutSideTemp = new Temperature(pLargeFont,temp,CELL_PADDING);
+    mOutSideTemp->SetPos(2,0);
+    mInfoRoot->Attach(mOutSideTemp);
+    mOutSideTemp->NewShedOutSide("--");
+    mOutSideTemp->NewShedTemperature("--");
+
 }
 
-void DaytimeDisplay::OnMQTT(const std::string &pTopic,const std::string &pData)
+void NightDisplay::OnMQTT(const std::string &pTopic,const std::string &pData)
 {
     // Record when we last seen a change, if we don't see one for a while something is wrong.
     // I send an 'hartbeat' with new data that is just a value incrementing.
@@ -116,25 +94,9 @@ void DaytimeDisplay::OnMQTT(const std::string &pTopic,const std::string &pData)
     {
         mOutSideTemp->NewShedTemperature(pData);
     }
-    else if( tinytools::string::CompareNoCase(pTopic,"/btc/gb") )
-    {
-        mBTC->UpdateGBP(pData);
-    }
-    else if( tinytools::string::CompareNoCase(pTopic,"/btc/usd") )
-    {
-        mBTC->UpdateUSD(pData);
-    }
-    else if( tinytools::string::CompareNoCase(pTopic,"/btc/change") )
-    {
-        mBTC->UpdateChange(pData);
-    }
     else if( tinytools::string::CompareNoCase(pTopic,"/btc/mine") )
     {
         myBTC = pData;
-    }
-    else if( tinytools::string::CompareNoCase(pTopic,"/solar/",7) )
-    {
-        mSolar->UpdateData(pTopic,pData);
     }
 }
 
