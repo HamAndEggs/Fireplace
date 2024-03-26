@@ -18,10 +18,9 @@
 #include <time.h>
 #include <chrono>
 
-DisplayClock::DisplayClock(int pBigFont,int pNormalFont,int pMiniFont,float CELL_PADDING,float BORDER_SIZE)
+DisplayClock::DisplayClock(int pBigFont,int pNormalFont,int pMiniFont,float CELL_PADDING,float BORDER_SIZE,eui::Colour theColour)
 {
     this->SetID("clock");
-    this->SetPos(0,0);
 
     eui::Style s;
     s.mBackground = eui::COLOUR_BLACK;
@@ -34,18 +33,21 @@ DisplayClock::DisplayClock(int pBigFont,int pNormalFont,int pMiniFont,float CELL
     clock = new eui::Element;
         clock->SetPadding(0.05f);
         clock->GetStyle().mAlignment = eui::ALIGN_CENTER_TOP;
+        clock->GetStyle().mForeground = theColour;        
         clock->SetFont(pBigFont);
     this->Attach(clock);
 
     dayName = new eui::Element;
         dayName->SetPadding(0.05f);
         dayName->GetStyle().mAlignment = eui::ALIGN_LEFT_BOTTOM;
+        dayName->GetStyle().mForeground = theColour;        
         dayName->SetFont(pNormalFont);
     this->Attach(dayName);
 
     dayNumber = new eui::Element;
         dayNumber->SetPadding(0.05f);
         dayNumber->GetStyle().mAlignment = eui::ALIGN_RIGHT_BOTTOM;
+        dayNumber->GetStyle().mForeground = theColour;        
         dayNumber->SetFont(pNormalFont);
     this->Attach(dayNumber);
 }

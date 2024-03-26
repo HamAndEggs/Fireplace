@@ -58,6 +58,7 @@ public:
                 current = daytimeDisplay;
             }
         }
+                current = nightDisplay;
 
     }
 
@@ -170,6 +171,7 @@ void MyUI::StartMQTT()
 //            std::cout << "MQTTData " << pTopic << " " << pData << "\n";
             mMQTTData[pTopic] = pData;
             daytimeDisplay->OnMQTT(pTopic,pData);
+            nightDisplay->OnMQTT(pTopic,pData);
         });
 
 }

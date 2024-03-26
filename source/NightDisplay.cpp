@@ -40,7 +40,8 @@ NightDisplay::NightDisplay(const std::string &pPath,eui::Graphics* pGraphics,int
 
     mInfoRoot->SetFont(pNormalFont);
 
-    eui::ElementPtr clock = new DisplayClock(pBigFont,pNormalFont,pMiniFont,CELL_PADDING,0);
+    eui::ElementPtr clock = new DisplayClock(pBigFont,pNormalFont,pMiniFont,CELL_PADDING,0,eui::COLOUR_GREY);
+    clock->SetPos(1,1);
     mInfoRoot->Attach(clock);
 
     eui::ElementPtr status = new eui::Element;
@@ -61,6 +62,8 @@ NightDisplay::NightDisplay(const std::string &pPath,eui::Graphics* pGraphics,int
             MyInvestment->SetPadding(CELL_PADDING);
             MyInvestment->SetPos(0,1);
             MyInvestment->SetFont(pBitcoinFont);
+            MyInvestment->GetStyle().mForeground = eui::COLOUR_GREY;        
+
             MyInvestment->SetOnUpdate([this](eui::ElementPtr pElement,const eui::Rectangle& pContentRect)
             {
                 pElement->SetText(myBTC);
@@ -72,9 +75,10 @@ NightDisplay::NightDisplay(const std::string &pPath,eui::Graphics* pGraphics,int
 
     eui::Style temp;
     temp.mBackground = eui::COLOUR_NONE;
+    temp.mForeground = eui::COLOUR_GREY;
 
     mOutSideTemp = new Temperature(pLargeFont,temp,CELL_PADDING);
-    mOutSideTemp->SetPos(2,0);
+    mOutSideTemp->SetPos(1,2);
     mInfoRoot->Attach(mOutSideTemp);
     mOutSideTemp->NewShedOutSide("--");
     mOutSideTemp->NewShedTemperature("--");

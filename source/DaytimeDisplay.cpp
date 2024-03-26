@@ -58,7 +58,11 @@ DaytimeDisplay::DaytimeDisplay(const std::string &pPath,eui::Graphics* pGraphics
         BottomPannel->Attach(mSolar);
     mInfoRoot->Attach(BottomPannel);
 
-    mInfoRoot->Attach(new DisplayClock(pBigFont,pNormalFont,pMiniFont,CELL_PADDING,BORDER_SIZE));
+    eui::ElementPtr clock = new DisplayClock(pBigFont,pNormalFont,pMiniFont,CELL_PADDING,BORDER_SIZE,eui::COLOUR_WHITE);
+    clock->SetPos(0,0);
+    mInfoRoot->Attach(clock);
+
+
     mInfoRoot->Attach(new DisplayWeather(pGraphics,pPath,pBigFont,pNormalFont,pMiniFont,CELL_PADDING,BORDER_SIZE,RECT_RADIUS));
 
     eui::ElementPtr status = new eui::Element;
