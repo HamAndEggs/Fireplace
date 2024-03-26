@@ -57,7 +57,6 @@ public:
             {
                 current = daytimeDisplay;
             }
-                current = nightDisplay;
         }
 
     }
