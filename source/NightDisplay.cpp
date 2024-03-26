@@ -78,10 +78,29 @@ NightDisplay::NightDisplay(const std::string &pPath,eui::Graphics* pGraphics,int
     temp.mForeground = eui::COLOUR_GREY;
 
     mOutSideTemp = new Temperature(pLargeFont,temp,CELL_PADDING);
-    mOutSideTemp->SetPos(1,2);
+        mOutSideTemp->SetPos(1,2);
+        mOutSideTemp->NewShedOutSide("--");
+        mOutSideTemp->NewShedTemperature("--");
     mInfoRoot->Attach(mOutSideTemp);
-    mOutSideTemp->NewShedOutSide("--");
-    mOutSideTemp->NewShedTemperature("--");
+
+    eui::Style SOCStyle;
+    SOCStyle.mForeground = eui::COLOUR_GREY;
+
+    mBatterySOC = new eui::Element;
+        mBatterySOC->SetPadding(0.05f);
+        mBatterySOC->SetText("Fetching");
+        mBatterySOC->SetPadding(CELL_PADDING);
+        mBatterySOC->SetPos(1,3);
+        mBatterySOC->SetStyle(SOCStyle);
+    mInfoRoot->Attach(mBatterySOC);
+
+    mInverter = new eui::Element;
+        mInverter->SetPadding(0.05f);
+        mInverter->SetText("Fetching");
+        mInverter->SetPadding(CELL_PADDING);
+        mInverter->SetPos(1,4);
+        mInverter->SetStyle(SOCStyle);
+    mInfoRoot->Attach(mInverter);
 
 }
 
@@ -102,5 +121,14 @@ void NightDisplay::OnMQTT(const std::string &pTopic,const std::string &pData)
     {
         myBTC = pData;
     }
+    else if( tinytools::string::CompareNoCase(pTopic,"/solar/battery/total") )
+    {
+        mBatterySOC->SetTextF("%d%%",std::stoi(pData));
+    }
+    else if( tinytools::string::CompareNoCase(pTopic,"/solar/inverter/total") )
+    {
+        mInverter->SetTextF("%d",std::stoi(pData));
+    }
+
 }
 

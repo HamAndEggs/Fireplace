@@ -31,6 +31,8 @@ public:
 
 private:
     eui::ElementPtr mInfoRoot = nullptr;
+    eui::ElementPtr mBatterySOC,mInverter;
+
     class Temperature *mOutSideTemp;
 
     std::string myBTC = "n/a";
