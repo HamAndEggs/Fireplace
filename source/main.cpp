@@ -139,6 +139,7 @@ void MyUI::StartMQTT()
     {
         "/outside/temperature","/outside/hartbeat",
         "/shed/temperature","/shed/hartbeat",
+        "/loft/temperature","/loft/hartbeat",
         "/btc/gb",
         "/btc/usd",
         "/btc/change",
@@ -162,7 +163,7 @@ void MyUI::StartMQTT()
     // Make sure there is data.
     mMQTTData["/outside/temperature"] = "--.-C";
     mMQTTData["/shed/temperature"] = "--.-C";
-    mMQTTData["/shed/temperature"] = "--.-C";
+    mMQTTData["/loft/temperature"] = "--.-C";
 
     MQTT = new MQTTData("MQTT",1883,topics,
         [this](const std::string &pTopic,const std::string &pData)

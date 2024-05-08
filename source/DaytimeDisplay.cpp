@@ -99,7 +99,7 @@ DaytimeDisplay::DaytimeDisplay(const std::string &pPath,eui::Graphics* pGraphics
     eui::ElementPtr line4 = new eui::Element;
         line4->SetPos(0,3);
         line4->SetGrid(3,2);
-        line4->SetSpan(3,1);    
+        line4->SetSpan(6,1);    
             // The temperature outside
         mOutSideTemp = new Temperature(pLargeFont   ,mBTC->GetUpStyle(),CELL_PADDING);
             mOutSideTemp->SetPos(0,0);
@@ -112,9 +112,13 @@ void DaytimeDisplay::OnMQTT(const std::string &pTopic,const std::string &pData)
     // Record when we last seen a change, if we don't see one for a while something is wrong.
     // I send an 'hartbeat' with new data that is just a value incrementing.
     // This means we get an update even if the tempareture does not change.
-    if( tinytools::string::CompareNoCase(pTopic,"/outside/temperature") && mOutSideTemp )
+    if( tinytools::string::CompareNoCase(pTopic,"/loft/temperature") && mOutSideTemp )
     {
-        mOutSideTemp->NewShedOutSide(pData);
+        mOutSideTemp->NewLoftTemperature(pData);
+    }
+    else if( tinytools::string::CompareNoCase(pTopic,"/outside/temperature") && mOutSideTemp )
+    {
+        mOutSideTemp->NewOutSideTemperature(pData);
     }
     else if( tinytools::string::CompareNoCase(pTopic,"/shed/temperature") && mOutSideTemp)
     {

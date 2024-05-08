@@ -40,7 +40,7 @@ NightDisplay::NightDisplay(const std::string &pPath,eui::Graphics* pGraphics,int
 
     mInfoRoot->SetFont(pNormalFont);
 
-    eui::ElementPtr clock = new DisplayClock(pBigFont,pNormalFont,pMiniFont,CELL_PADDING,0,eui::COLOUR_GREY);
+    eui::ElementPtr clock = new DisplayClock(pBigFont,pNormalFont,pMiniFont,CELL_PADDING,0,eui::COLOUR_DARK_GREY);
     clock->SetPos(1,1);
     mInfoRoot->Attach(clock);
 
@@ -62,7 +62,7 @@ NightDisplay::NightDisplay(const std::string &pPath,eui::Graphics* pGraphics,int
             MyInvestment->SetPadding(CELL_PADDING);
             MyInvestment->SetPos(0,1);
             MyInvestment->SetFont(pBitcoinFont);
-            MyInvestment->GetStyle().mForeground = eui::COLOUR_GREY;        
+            MyInvestment->GetStyle().mForeground = eui::COLOUR_DARK_GREY;        
 
             MyInvestment->SetOnUpdate([this](eui::ElementPtr pElement,const eui::Rectangle& pContentRect)
             {
@@ -75,16 +75,17 @@ NightDisplay::NightDisplay(const std::string &pPath,eui::Graphics* pGraphics,int
 
     eui::Style temp;
     temp.mBackground = eui::COLOUR_NONE;
-    temp.mForeground = eui::COLOUR_GREY;
+    temp.mForeground = eui::COLOUR_DARK_GREY;
 
     mOutSideTemp = new Temperature(pLargeFont,temp,CELL_PADDING);
-        mOutSideTemp->SetPos(1,2);
-        mOutSideTemp->NewShedOutSide("--");
+        mOutSideTemp->SetPos(0,2);
+        mOutSideTemp->SetSpan(3,1);    
+        mOutSideTemp->NewOutSideTemperature("--");
         mOutSideTemp->NewShedTemperature("--");
     mInfoRoot->Attach(mOutSideTemp);
 
     eui::Style SOCStyle;
-    SOCStyle.mForeground = eui::COLOUR_GREY;
+    SOCStyle.mForeground = eui::COLOUR_DARK_GREY;
 
     mBatterySOC = new eui::Element;
         mBatterySOC->SetPadding(0.05f);
@@ -109,9 +110,13 @@ void NightDisplay::OnMQTT(const std::string &pTopic,const std::string &pData)
     // Record when we last seen a change, if we don't see one for a while something is wrong.
     // I send an 'hartbeat' with new data that is just a value incrementing.
     // This means we get an update even if the tempareture does not change.
-    if( tinytools::string::CompareNoCase(pTopic,"/outside/temperature") && mOutSideTemp )
+    if( tinytools::string::CompareNoCase(pTopic,"/loft/temperature") && mOutSideTemp )
     {
-        mOutSideTemp->NewShedOutSide(pData);
+        mOutSideTemp->NewLoftTemperature(pData);
+    }
+    else if( tinytools::string::CompareNoCase(pTopic,"/outside/temperature") && mOutSideTemp )
+    {
+        mOutSideTemp->NewOutSideTemperature(pData);
     }
     else if( tinytools::string::CompareNoCase(pTopic,"/shed/temperature") && mOutSideTemp)
     {
